@@ -18,6 +18,7 @@ html, body, canvas {
 }
 
 div {
+    user-select: none; /* standard property */
     -webkit-user-select: none; /* webkit (safari, chrome) browsers */
     -moz-user-select: none; /* mozilla browsers */
     -khtml-user-select: none; /* webkit (konqueror) browsers */
@@ -73,7 +74,11 @@ div {
     bottom: 5px;
     left: 5px;
     border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
     pointer-events: none;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 
 .chatbox .chat-list {
@@ -282,4 +287,30 @@ input [type="image"]:focus{
 *:focus {
  outline: 1px solid transparent;
  border-style: none;
+}
+
+.wallet-button {
+    background-color: #1e50f5;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.wallet-address {
+    font-size: 14px;
+    color: #e26b48;
+    margin-bottom: 15px;
+    word-break: break-all;
+}
+
+.token-balance {
+    background-color: #f8e4e0;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #1e50f5;
 }

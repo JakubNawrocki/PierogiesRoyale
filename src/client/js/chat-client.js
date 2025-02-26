@@ -65,16 +65,23 @@ class ChatClient {
 
     // Chat box implementation for the users.
     addChatLine(name, message, me) {
-        if (this.mobile) {
-            return;
-        }
-        var newline = document.createElement('li');
-
-        // Colours the chat input correctly.
-        newline.className = (me) ? 'me' : 'friend';
-        newline.innerHTML = '<b>' + ((name.length < 1) ? 'An unnamed cell' : name) + '</b>: ' + message;
-
+        if (this.mobile) return;
+        
+        // Sanitize input
+        const sanitizedName = this.sanitizeInput(name);
+        const sanitizedMessage = this.sanitizeInput(message);
+        
+        const newline = document.createElement('li');
+        newline.className = me ? 'me' : 'friend';
+        newline.innerHTML = `<b>${sanitizedName || 'An unnamed cell'}</b>: ${sanitizedMessage}`;
+        
         this.appendMessage(newline);
+    }
+
+    sanitizeInput(input) {
+        const div = document.createElement('div');
+        div.textContent = input;
+        return div.innerHTML;
     }
 
     // Chat box implementation for the system.

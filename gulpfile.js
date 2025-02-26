@@ -27,9 +27,11 @@ function runServer(done) {
 }
 
 function buildServer() {
-    let task = gulp.src(['src/server/**/*.*', 'src/server/**/*.js']);
+    let task = gulp.src(['src/server/**/*.*', 'src/server/**/*.js', 'src/**/*.ts']);
     if (!process.env.IS_DEV) {
-        task = task.pipe(babel())
+        task = task.pipe(babel({
+            presets: ['@babel/preset-typescript']
+        }))
     }
     return task.pipe(gulp.dest('bin/server/'));
 }

@@ -308,7 +308,14 @@ function animloop() {
 }
 
 function gameLoop() {
+    const now = performance.now();
+    const delta = now - (gameLoop.lastTime || now);
+    gameLoop.lastTime = now;
+
     if (global.gameStart) {
+        // Cache DOM queries
+        const statusElement = document.getElementById('status');
+
         graph.fillStyle = global.backgroundColor;
         graph.fillRect(0, 0, global.screen.width, global.screen.height);
 
@@ -359,6 +366,24 @@ function gameLoop() {
         render.drawCells(cellsToDraw, playerConfig, global.toggleMassState, borders, graph);
 
         socket.emit('0', window.canvas.target); // playerSendTarget "Heartbeat".
+    }
+}
+
+// Add error handling for wallet connections
+async function connectWallet() {
+    try {
+        const accounts = await window.ethereum.request({ 
+            method: 'eth_requestAccounts' 
+        });
+        if (!accounts || accounts.length === 0) {
+            throw new Error('No accounts found');
+        }
+        window.chat.addSystemLine('Wallet connected successfully!');
+        return accounts[0];
+    } catch (error) {
+        window.chat.addSystemLine('Failed to connect wallet: ' + error.message);
+        console.error('Wallet connection failed:', error);
+        throw error;
     }
 }
 

@@ -13,7 +13,11 @@
 </head>
 <body>
     <div id="gameAreaWrapper">
-        <div id="status"><span class="title">Leaderboard</span></div>
+        <div id="status">
+            <span class="title">Leaderboard</span>
+            <!-- Add token balance display -->
+            <div id="tokenBalance" class="token-balance">PIRGS: 0</div>
+        </div>
         <div class="chatbox" id="chatbox">
             <ul id="chatList" class="chat-list"></ul>
             <input id="chatInput" type="text" class="chat-input" placeholder="Chat here..." maxlength="35" />
@@ -27,6 +31,11 @@
     <div id="startMenuWrapper">
         <div id="startMenu">
             <p>Open Agar</p>
+            <!-- Add wallet connection before name input -->
+            <div id="walletSection">
+                <button id="connectWallet" class="wallet-button">Connect Wallet</button>
+                <div id="walletAddress" class="wallet-address"></div>
+            </div>
             <input type="text" tabindex="0" autofocus placeholder="Enter your name here" id="playerNameInput" maxlength="25" />
             <b class="input-error">Nick must be alphanumeric characters only!</b>
             <br />
@@ -58,7 +67,9 @@
         </div>
     </div>
     <!-- JS -->
-    <script src="//code.jquery.com/jquery-2.2.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-2.2.0.min.js" integrity="sha256-ihAoc6M/JPfrIiIeayPE9xjin4UWjsx2mjW/rtmxLM4=" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="js/jquery-2.2.0.min.js"><\/script>')</script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
