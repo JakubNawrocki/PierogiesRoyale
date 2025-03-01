@@ -3,6 +3,7 @@ var render = require('./render');
 var ChatClient = require('./chat-client');
 var Canvas = require('./canvas');
 var global = require('./global');
+var WalletIntegration = require('./wallet-integration');
 
 var playerNameInput = document.getElementById('playerNameInput');
 var socket;
@@ -51,6 +52,81 @@ window.onload = function () {
     var btn = document.getElementById('startButton'),
         btnS = document.getElementById('spectateButton'),
         nickErrorText = document.querySelector('#startMenu .input-error');
+
+    // Fix DOM manipulations - use safer approach
+    const startMenu = document.getElementById('startMenu');
+    
+    // Add Pierogies.io branding - only if elements don't exist yet
+    if (!document.querySelector('.brand-logo')) {
+        const brandingHeader = document.createElement('div');
+        brandingHeader.className = 'brand-logo';
+        brandingHeader.innerHTML = '<img src="/img/pierogies-logo.png" alt="Pierogies.io">';
+        
+        // Insert at beginning of startMenu
+        startMenu.insertBefore(brandingHeader, startMenu.firstChild);
+    }
+    
+    if (!document.querySelector('.brand-tagline')) {
+        const brandingTagline = document.createElement('div');
+        brandingTagline.className = 'brand-tagline';
+        brandingTagline.innerText = 'Play & Earn Delicious Rewards';
+        
+        // Find the paragraph element and insert after it
+        const paragraph = startMenu.querySelector('p');
+        if (paragraph && paragraph.nextSibling) {
+            startMenu.insertBefore(brandingTagline, paragraph.nextSibling);
+        } else if (paragraph) {
+            startMenu.appendChild(brandingTagline);
+        } else {
+            // If paragraph doesn't exist, just append to startMenu
+            startMenu.appendChild(brandingTagline);
+        }
+    }
+
+    // Add wallet connect button if it doesn't exist yet
+    if (!document.querySelector('.wallet-button')) {
+        const walletButton = document.createElement('button');
+        walletButton.className = 'wallet-button';
+        walletButton.innerText = 'Connect Wallet';
+        
+        // Add the coming soon badge
+        const badge = document.createElement('span');
+        badge.className = 'coming-soon-badge';
+        badge.innerText = 'Coming Soon';
+        walletButton.appendChild(badge);
+        
+        walletButton.onclick = async function() {
+            try {
+                const address = await WalletIntegration.connect();
+                if (address) {
+                    walletButton.style.display = 'none';
+                    
+                    // Create wallet info if it doesn't exist
+                    if (!document.querySelector('.wallet-address')) {
+                        const walletInfo = document.createElement('div');
+                        walletInfo.className = 'wallet-address';
+                        walletInfo.innerText = `${address.slice(0, 6)}...${address.slice(-4)}`;
+                        startMenu.insertBefore(walletInfo, btn);
+                    }
+                    
+                    // Get and display token balance if it doesn't exist
+                    if (!document.querySelector('.token-balance')) {
+                        const balance = await WalletIntegration.getTokenBalance();
+                        const balanceElement = document.createElement('div');
+                        balanceElement.className = 'token-balance';
+                        balanceElement.innerText = `${balance} PIEROGI`;
+                        startMenu.insertBefore(balanceElement, btn);
+                    }
+                }
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                window.chat.addSystemLine('Failed to connect wallet: ' + error.message);
+            }
+        };
+        
+        // Insert before the start button
+        startMenu.insertBefore(walletButton, btn);
+    }
 
     btnS.onclick = function () {
         startGame('spectator');
@@ -369,17 +445,15 @@ function gameLoop() {
     }
 }
 
-// Add error handling for wallet connections
+// Update wallet connection function to use the new WalletIntegration module
 async function connectWallet() {
     try {
-        const accounts = await window.ethereum.request({ 
-            method: 'eth_requestAccounts' 
-        });
-        if (!accounts || accounts.length === 0) {
-            throw new Error('No accounts found');
+        const address = await WalletIntegration.connect();
+        if (!address) {
+            throw new Error('No wallet connected');
         }
         window.chat.addSystemLine('Wallet connected successfully!');
-        return accounts[0];
+        return address;
     } catch (error) {
         window.chat.addSystemLine('Failed to connect wallet: ' + error.message);
         console.error('Wallet connection failed:', error);
